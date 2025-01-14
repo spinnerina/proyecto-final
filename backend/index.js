@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use('/api/products', productRouter);
+app.use('/api/auth', authRoute);
 
 app.use("*", (req, res) => {
     res.status(404).json({ error: "Resource not found" })

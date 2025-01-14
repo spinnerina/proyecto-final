@@ -19,6 +19,15 @@ export default class ProductController {
             res.status(500).json({ error: "Error to save product" });
         }
     }
+
+    static async getCategory(req,res){
+        try{
+            const category = await Product.distinct("category", { status: true });
+            res.status(200).json(category);
+        }catch(error){
+            res.status(500).json({ error: "Error to get category" });
+        }
+    }
     
     static async getAllProducts(req, res) {
         try {
