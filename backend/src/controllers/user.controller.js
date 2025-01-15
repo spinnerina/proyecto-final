@@ -16,22 +16,23 @@ export default class UserController {
             const user = await User.find({ email });
 
             if(user.length === 0) {
-                return res.status(404).json({ error: "Incorrect data" });
+                return res.status(400).json({ error: "Incorrect data" });
             }
             
             const middleware = new Middleware();
             const validatePassword = await middleware.validatePassword(password, user[0].password);
             if(!validatePassword) {
-                return res.status(404).json({ error: "Incorrect data" });
+                return res.status(400).json({ error: "Incorrect data" });
             }
-            
-            const token = await middleware.generateTokenSession(usu_id, usu_email);
+
+            const token = await middleware.generateTokenSession(user[0].id, user[0].email);
             if(token == null){
-                return { statusCode: 403, return: { message: "Token not generated"} };
+                return res.status(400).json({  message: "Token not generated" });
             } 
     
-            return { statusCode: 200, return: { message: "Correct login", token: token }};
+            return res.status(200).json({ message: "Correct login", token: token });
         }catch(error) {
+            console.log(error);
             res.status(500).json({ error: "Error to login" });
         }
     }
