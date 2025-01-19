@@ -7,9 +7,9 @@ const middleware = new Middleware();
 
 productRouter.get('/', ProductController.getAllProducts);
 productRouter.get('/stats', ProductController.getProductStats);
-productRouter.get('/filter', ProductController.getProductByFilter);
+productRouter.post('/filter', ProductController.getProductByFilter);
 productRouter.get('/categories', ProductController.getCategory);
-productRouter.get('/:id', ProductController.getProductById);
+productRouter.get('/:id', middleware.validateToken, ProductController.getProductById);
 productRouter.post('/', middleware.validateToken, ProductController.createProduct);
 productRouter.put('/:id', middleware.validateToken, ProductController.updateProduct);
 productRouter.delete('/:id', middleware.validateToken, ProductController.deleteProduct);
