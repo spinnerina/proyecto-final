@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
 import axiosInstance from '../config/axiosInstance.js';
+import { useRouter } from 'vue-router';
 
 const data = reactive({
     selectedProductId: null,
@@ -13,24 +14,31 @@ const products = ref([]);
 const categories = ref([]);
 const productStatistics = ref([]);
 const selectedCategory = ref("");
+const router = useRouter();
 
 const getAllProduct = async () => {
     products.value = [];
     const { status, data } = await axiosInstance.get('products');
     if (status == 200) {
         products.value = data;
+        getStat();
     }
 }
 
 const getProductFilter = async () => {
     products.value = [];
+    const token = sessionStorage.getItem('token');
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    };
     const json = {
         category: selectedCategory.value,
         minPrice: data.minPrice,
         ...(data.maxPrice > 0 && { maxPrice: data.maxPrice })
     };
-    console.log(json);
-    const { status, data: responseData } = await axiosInstance.post('products/filter', json);
+    const { status, data: responseData } = await axiosInstance.post('products/filter', json, config);
     if (status === 200) {
         products.value = responseData;
     }
@@ -101,10 +109,14 @@ const closeModal = () => {
     }
 };
 
+const closeSession = () => {
+    sessionStorage.removeItem('token');
+    router.push({ name: 'login' });
+}
+
 onMounted(() => {
     getAllProduct();
     getCategories();
-    getStat();
 });
 </script>
 
@@ -117,7 +129,7 @@ onMounted(() => {
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <router-link to="/" class="nav-link active">Home</router-link>
                     </li>
@@ -125,9 +137,15 @@ onMounted(() => {
                         <router-link to="/create" class="nav-link">Crear producto</router-link>
                     </li>
                 </ul>
+                <div class="d-flex">
+                    <a class="btn btn-outline-danger d-flex align-items-center" @click="closeSession()">
+                        <i class="bi bi-box-arrow-right me-2"></i> Logout
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
+
     <div class="container mt-5">
         <div class="card">
             <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">

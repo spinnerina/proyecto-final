@@ -1,0 +1,163 @@
+{
+	"info": {
+		"_postman_id": "8fc3ba88-a964-4b3b-bbe2-ce472c10ff54",
+		"name": "Final-nodejs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "23066936"
+	},
+	"item": [
+		{
+			"name": "Create product",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Bingo\",\r\n    \"description\":\"Juego de mesa bingo\",\r\n    \"price\": 6000,\r\n    \"stock\": 50,\r\n    \"category\":\"Jugetes\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/api/products"
+			},
+			"response": []
+		},
+		{
+			"name": "Get all products",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/api/products"
+			},
+			"response": []
+		},
+		{
+			"name": "Get products by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/api/products/67863ff9b08413521e4b1812"
+			},
+			"response": []
+		},
+		{
+			"name": "Get products by filters",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"category\": \"Jugetes\",\r\n    \"minPrice\": 200,\r\n    \"maxPrice\": 2000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/api/products/filter"
+			},
+			"response": []
+		},
+		{
+			"name": "Get stats products",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/api/products/stats"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete products",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:3000/api/products/6786471070a8b0bec231e76e"
+			},
+			"response": []
+		},
+		{
+			"name": "Update product",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODc5ODNjOGM2YjkzODNkNmI0ZjViYyIsInVzZXJuYW1lIjoibWZlc3NpYS4yMDAxQGdtYWlsLmNvbSIsImlhdCI6MTczNzM3OTg1NCwiZXhwIjoxNzM3MzgzNDU0fQ.13pZu2HnZ2Y9tG_3jn6XY8hkKVDthaRw00JvBIk7h6c"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Prueba\",\r\n    \"description\": \"Esto es una prueba desde vuejs\",\r\n    \"price\": 1001,\r\n    \"category\": \"Prueba\",\r\n    \"stock\": 10\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/api/products/678e2aa2f322c5c955153b7a"
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"mfessia.2001@gmail.com\", \r\n    \"password\": \"matifessia\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/api/auth/login"
+			},
+			"response": []
+		},
+		{
+			"name": "Register",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"admin\",\r\n    \"email\": \"admin@example.com\",\r\n    \"password\": \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/api/auth/register"
+			},
+			"response": []
+		}
+	]
+}

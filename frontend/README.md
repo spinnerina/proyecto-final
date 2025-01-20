@@ -1,29 +1,27 @@
 # frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Este template te ayudará a comenzar a desarrollar con Vue 3 en Vite.
 
-## Recommended IDE Setup
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Configuración del Proyecto
 
-## Customize configuration
+1. Instalar las dependencias del proyecto:
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+    ```sh
+    npm install
+    ```
 
-## Project Setup
+2. Si necesitas cambiar el puerto de la API, debes modificar la URL base en `src/config/axiosInstance.js`:
 
-```sh
-npm install
-```
+    ```js
+    // src/config/axiosInstance.js
+    const axiosInstance = axios.create({
+        baseURL: 'http://localhost:3000/api/',
+    });
+    ```
 
-### Compile and Hot-Reload for Development
+### Compilar y Recargar en Caliente para Desarrollo
 
 ```sh
 npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
 ```

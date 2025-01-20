@@ -1,5 +1,6 @@
 <script>
 import axiosInstance from '../config/axiosInstance.js';
+import {  useRouter } from 'vue-router';
 export default {
     data() {
         return {
@@ -24,8 +25,9 @@ export default {
                     password: this.password,
                 }
                 try {
-                    const res = await axios.post('auth/register', json);
+                    const res = await axiosInstance.post('auth/register', json);
                     if (res.status == 201) {
+                        const router = useRouter();
                         this.isRegister = true;
                         setTimeout(() => {
                             this.name = '';
@@ -33,6 +35,7 @@ export default {
                             this.password = '';
                             this.confirmPassword = '';
                             this.isRegister = false;
+                            router.push({ name: 'login' });
                         }, 2000);
                     }
                 } catch (error) {

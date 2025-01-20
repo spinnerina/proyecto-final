@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import axiosInstance from '../config/axiosInstance.js';
+import {  useRouter } from 'vue-router';
 
 // Reactive state
 const form = reactive({
@@ -12,6 +13,7 @@ const form = reactive({
 });
 const categories = ref([]);
 const isCreated = ref(false);
+const router = useRouter();
 
 // Fetch categories on component mount
 const getCategories = async () => {
@@ -41,6 +43,7 @@ const createProduct = async () => {
                 setTimeout(() => {
                     Object.assign(form, { name: '', description: '', price: 0, stock: 0, category: '' });
                     isCreated.value = false;
+                    router.push({ name: 'home' });
                 }, 2000);
             }
         } catch (error) {

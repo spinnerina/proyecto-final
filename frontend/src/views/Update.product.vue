@@ -52,8 +52,8 @@ const updateProduct = async () => {
                 isUpdate.value = true;
                 setTimeout(() => {
                     isUpdate.value = false;
+                    router.push({ name: 'home' });
                 }, 2000);
-                router.push({ name: 'home' });
             }
         } catch (error) {
             alert(`Error al crear el producto: ${error.message || error}`);

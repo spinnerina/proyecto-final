@@ -52,22 +52,21 @@ export default class ProductController {
     
     static async updateProduct(req, res) {
         try {
-
+            const id = req.params.id;
             const productUpdate = req.body;
+
             const validate = updateProductSchemaValidator.safeParse(productUpdate);
             if (!validate.success) {
-                return res.status(400).json({ error: "bad request" });
+                return res.status(400).json({ error: "Bad request", details: validate.error.errors });
             }
-            const id = req.params.id;
-            const prod = req.body;
 
-            const updateProduct = await Product.findByIdAndUpdate(id, { prod }, { new: true });
+            const updatedProduct = await Product.findByIdAndUpdate(id, productUpdate, { new: true });
 
-            if (!updateProduct) {
+            if (!updatedProduct) {
                 return res.status(404).json({ error: "Product not found" });
             }
 
-            res.status(200).json(updateProduct);
+            res.status(200).json(updatedProduct);
         } catch (error) {
             res.status(500).json({ error: "Error to update product" });
         }
