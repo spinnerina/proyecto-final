@@ -6,28 +6,35 @@ const data = reactive({
     selectedProductId: null,
     selectedProductName: '',
     confirmModal: null,
+    minPrice: '',
+    maxPrice: ''
 });
 const products = ref([]);
 const categories = ref([]);
+const productStatistics = ref([]);
 const selectedCategory = ref("");
 
 const getAllProduct = async () => {
-    products.value =[];
-    if (selectedCategory != "") {
-        const json = {
-            category: selectedCategory.value
-        };
-        const { status, data } = await axiosInstance.post('products/filter', json);
-        if (status == 200) {
-            products.value = data;
-            return;
-        }
-    }
+    products.value = [];
     const { status, data } = await axiosInstance.get('products');
     if (status == 200) {
         products.value = data;
     }
 }
+
+const getProductFilter = async () => {
+    products.value = [];
+    const json = {
+        category: selectedCategory.value,
+        minPrice: data.minPrice,
+        ...(data.maxPrice > 0 && { maxPrice: data.maxPrice })
+    };
+    console.log(json);
+    const { status, data: responseData } = await axiosInstance.post('products/filter', json);
+    if (status === 200) {
+        products.value = responseData;
+    }
+};
 
 const getCategories = async () => {
     try {
@@ -40,8 +47,25 @@ const getCategories = async () => {
     }
 };
 
+const getStat = async () => {
+    try {
+        const token = sessionStorage.getItem('token');
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        };
+        const { status, data } = await axiosInstance.get('products/stats', config);
+        if (status === 200) {
+            productStatistics.value = data;
+        }
+    } catch (error) {
+        alert(`Error al traer las categorías: ${error.message || error}`);
+    }
+};
+
 const deleteProduct = async () => {
-    if (this.data.selectedProductId !== null) {
+    if (data.selectedProductId !== null) {
         const token = sessionStorage.getItem('token');
         const config = {
             headers: {
@@ -49,37 +73,38 @@ const deleteProduct = async () => {
             }
         };
         try {
-            const { status, data } = await axiosInstance.delete(`products/${this.selectedProductId}`, config);
+            const { status } = await axiosInstance.delete(`products/${data.selectedProductId}`, config);
             if (status === 200) {
                 getAllProduct();
             }
         } catch (error) {
             alert('Error al eliminar el producto:', error);
         } finally {
-            this.closeModal();
-            this.data.selectedProductId = null;
-            this.data.selectedProductName = '';
+            closeModal();
+            data.selectedProductId = null;
+            data.selectedProductName = '';
         }
     }
-}
+};
 
 const showConfirmModal = (_id, productName) => {
-    this.data.selectedProductId = _id;
-    this.data.selectedProductName = productName;
+    data.selectedProductId = _id;
+    data.selectedProductName = productName;
 
-    this.data.confirmModal = new bootstrap.Modal(this.$refs.confirmModal);
-    this.data.confirmModal.show();
-}
+    data.confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    data.confirmModal.show();
+};
 
 const closeModal = () => {
-    if (this.data.confirmModal) {
-        this.data.confirmModal.hide();
+    if (data.confirmModal) {
+        data.confirmModal.hide();
     }
-}
+};
 
 onMounted(() => {
     getAllProduct();
     getCategories();
+    getStat();
 });
 </script>
 
@@ -107,13 +132,24 @@ onMounted(() => {
         <div class="card">
             <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">Lista de Productos</h4>
-                <div>
-                    <select v-model="selectedCategory" @change="getAllProduct" class="form-select form-select-sm w-auto">
+                <div class="d-flex gap-2">
+                    <!-- Filtro por categoría -->
+                    <label for="catergories" class="form-label mb-0 me-2">Categorías:</label>
+                    <select v-model="selectedCategory" @change="getProductFilter"
+                        class="form-select form-select-sm w-auto" id="catergories">
                         <option value="">Todas las categorías</option>
                         <option v-for="category in categories" :key="category" :value="category">
                             {{ category }}
                         </option>
                     </select>
+                    <!-- Filtro por precio mínimo -->
+                    <label for="minPrice" class="form-label mb-0 me-2">Precio mínimo:</label>
+                    <input id="minPrice" v-model.number="data.minPrice" @input="getProductFilter" type="number"
+                        class="form-control form-control-sm w-auto" placeholder="Precio mínimo" />
+                    <!-- Filtro por precio máximo -->
+                    <label for="maxPrice" class="form-label mb-0 me-2 ms-2">Precio máximo:</label>
+                    <input id="maxPrice" v-model.number="data.maxPrice" @input="getProductFilter" type="number"
+                        class="form-control form-control-sm w-auto" placeholder="Precio máximo" />
                 </div>
             </div>
             <div class="card-body">
@@ -145,8 +181,8 @@ onMounted(() => {
                                         :to="{ name: 'product', params: { id: product._id } }">
                                         <i class="bi bi-eye"></i>
                                     </router-link>
-                                    <router-link class="btn btn-sm btn-warning" 
-                                        :to="{ name: 'updateProduct', params: { id: product._id }}">
+                                    <router-link class="btn btn-sm btn-warning"
+                                        :to="{ name: 'updateProduct', params: { id: product._id } }">
                                         <i class="bi bi-pencil"></i>
                                     </router-link>
                                     <button class="btn btn-sm btn-danger"
@@ -165,6 +201,28 @@ onMounted(() => {
         </div>
     </div>
 
+    <!-- Cuadro de estadisticas -->
+    <div class="statistics container mt-5">
+        <h1 class="text-center mb-4">Estadísticas de Productos</h1>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Categoría</th>
+                        <th scope="col">Cantidad de Productos</th>
+                        <th scope="col">Precio Promedio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="stat in productStatistics" :key="stat.category">
+                        <td>{{ stat.category }}</td>
+                        <td>{{ stat.productCount }}</td>
+                        <td>{{ stat.averagePrice | currency }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <!-- Modal de Confirmación -->
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true"

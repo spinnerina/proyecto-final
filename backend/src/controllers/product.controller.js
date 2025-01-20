@@ -59,9 +59,9 @@ export default class ProductController {
                 return res.status(400).json({ error: "bad request" });
             }
             const id = req.params.id;
-            const status = req.body.status;
+            const prod = req.body;
 
-            const updateProduct = await Product.findByIdAndUpdate(id, { status}, { new: true });
+            const updateProduct = await Product.findByIdAndUpdate(id, { prod }, { new: true });
 
             if (!updateProduct) {
                 return res.status(404).json({ error: "Product not found" });
@@ -120,12 +120,12 @@ export default class ProductController {
             const filter = {};
 
             if (category) filter.category = category;
-            if (minPrice !== undefined) filter.price = { ...filter.price, $gte: minPrice };
-            if (maxPrice !== undefined) filter.price = { ...filter.price, $lte: maxPrice };
+            if (minPrice !== undefined && minPrice !== "") filter.price = { ...filter.price, $gte: minPrice };
+            if (maxPrice !== undefined && maxPrice !== "") filter.price = { ...filter.price, $lte: maxPrice };
 
             const products = await Product.find(filter);
             if(products.length === 0) {
-                return res.status(404).json({ error: "Products not found" });
+                return res.status(403).json({ error: "Products not found" });
             }
             res.status(200).json(products);
         } catch (error) {
